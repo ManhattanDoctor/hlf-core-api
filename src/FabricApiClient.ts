@@ -11,11 +11,12 @@ import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
 import { IFabricBlock } from './IFabricBlock';
 import { IFabricTransaction } from './IFabricTransaction';
 import { IFabricConnectionSettings } from './IFabricConnectionSettings';
+import { IFabricConnection } from './IFabricConnection';
 
 export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
     //
-    // 	Static Methods
+    // 	Block Static Methods
     //
     // --------------------------------------------------------------------------
 
@@ -37,6 +38,29 @@ export class FabricApiClient extends LoggerWrapper {
             return new Date(data.payload.header.channel_header.timestamp);
         }
         return null;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    // 	Connection Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static async createConnection(settings: IFabricConnectionSettings, wallet?: Wallet): Promise<IFabricConnection> {
+        let gateway = new Gateway();
+        if (_.isNil(wallet)) {
+            wallet = await FabricApiClient.createWallet(settings);
+        }
+
+        await gateway.connect(settings.fabricConnectionSettingsPath, {
+            wallet,
+            identity: settings.fabricIdentity,
+            clientTlsIdentity: settings.fabricTlsIdentity,
+            discovery: { enabled: settings.fabricIsDiscoveryEnabled, asLocalhost: settings.fabricIsDiscoveryAsLocalhost }
+        });
+
+        let network = await gateway.getNetwork(settings.fabricNetworkName);
+        return { gateway, wallet, network, channel: network.getChannel(), contract: network.getContract(settings.fabricChaincodeName) };
     }
 
     public static async createWallet(settings: IFabricConnectionSettings): Promise<Wallet> {
@@ -63,12 +87,7 @@ export class FabricApiClient extends LoggerWrapper {
     protected observer: Subject<ObservableData<LoadableEvent, any>>;
     protected connectionPromise: PromiseHandler<void, ExtendedError>;
 
-    protected _network: Network;
-    protected _channel: Channel;
-    protected _contract: Contract;
-
-    protected _wallet: Wallet;
-    protected _gateway: Gateway;
+    protected _connection: IFabricConnection;
     protected _isConnected: boolean;
 
     // --------------------------------------------------------------------------
@@ -91,7 +110,7 @@ export class FabricApiClient extends LoggerWrapper {
         if (_.isNil(this.settings)) {
             throw new ExtendedError(`Unable to connect: settings is nil`);
         }
-        if (this.connectionPromise) {
+        if (!_.isNil(this.connectionPromise)) {
             return this.connectionPromise.promise;
         }
         this.connectionPromise = PromiseHandler.create();
@@ -100,13 +119,11 @@ export class FabricApiClient extends LoggerWrapper {
     }
 
     public disconnect(error?: ExtendedError): void {
-        if (this.connectionPromise) {
+        if (!_.isNil(this.connectionPromise)) {
             this.connectionPromise.reject(error);
             this.connectionPromise = null;
         }
-
-        this.gateway = null;
-        this._isConnected = false;
+        this.connection = null;
     }
 
     public destroy(): void {
@@ -123,28 +140,10 @@ export class FabricApiClient extends LoggerWrapper {
         this.debug(`Connecting to Fabric "${this.settings.fabricIdentity}:${this.settings.fabricNetworkName}:${this.settings.fabricChaincodeName}"`);
 
         try {
-            this.gateway = new Gateway();
-            await this.gateway.connect(this.settings.fabricConnectionSettingsPath, {
-                wallet: await this.getWallet(),
-                identity: this.settings.fabricIdentity,
-                clientTlsIdentity: this.settings.fabricTlsIdentity,
-                discovery: { enabled: this.settings.fabricIsDiscoveryEnabled, asLocalhost: this.settings.fabricIsDiscoveryAsLocalhost }
-            });
-
-            this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
-            this._channel = this.network.getChannel();
-            this._contract = this.network.getContract(this.settings.fabricChaincodeName);
-            this.connectionConnectCompleteHandler();
+            this.connection = await FabricApiClient.createConnection(this.settings);
         } catch (error) {
             this.connectionConnectErrorHandler(ExtendedError.create(error, ExtendedError.DEFAULT_ERROR_CODE));
         }
-    }
-
-    protected async getWallet(): Promise<Wallet> {
-        if (_.isNil(this._wallet)) {
-            this._wallet = await FabricApiClient.createWallet(this.settings);
-        }
-        return this._wallet;
     }
 
     // --------------------------------------------------------------------------
@@ -154,13 +153,12 @@ export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
 
     protected connectionConnectCompleteHandler = (): void => {
-        this._isConnected = true;
-        if (this.connectionPromise) {
+        if (!_.isNil(this.connectionPromise)) {
             this.connectionPromise.resolve();
         }
     };
 
-    protected connectionConnectErrorHandler = (error: ExtendedError): void => {
+    protected connectionConnectErrorHandler = (error?: ExtendedError): void => {
         this.disconnect(error);
     };
 
@@ -227,37 +225,46 @@ export class FabricApiClient extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
+    public get connection(): IFabricConnection {
+        return this._connection;
+    }
+
+    public set connection(value: IFabricConnection) {
+        if (value !== this._connection) {
+            return;
+        }
+        if (!_.isNil(this._connection)) {
+            this._connection.gateway.disconnect();
+        }
+
+        this._connection = value;
+
+        if (!_.isNil(this._connection)) {
+            this._isConnected = true;
+            this.connectionConnectCompleteHandler();
+        } else {
+            this._isConnected = false;
+            this.connectionConnectErrorHandler();
+        }
+    }
+
     public get isConnected(): boolean {
         return this._isConnected;
     }
 
     public get network(): Network {
-        return this._network;
+        return !_.isNil(this.connection) ? this.connection.network : null;
     }
 
     public get channel(): Channel {
-        return this._channel;
+        return !_.isNil(this.connection) ? this.connection.channel : null;
     }
 
     public get contract(): Contract {
-        return this._contract;
+        return !_.isNil(this.connection) ? this.connection.contract : null;
     }
 
     public get gateway(): Gateway {
-        return this._gateway;
-    }
-
-    public set gateway(value: Gateway) {
-        if (value === this._gateway) {
-            return;
-        }
-
-        if (this._gateway) {
-            this._network = null;
-            this._channel = null;
-            this._contract = null;
-            this._gateway.disconnect();
-        }
-        this._gateway = value;
+        return !_.isNil(this.connection) ? this.connection.gateway : null;
     }
 }

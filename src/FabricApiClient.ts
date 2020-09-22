@@ -10,6 +10,7 @@ import { IFabricChannelInfo } from './IFabricChannelInfo';
 import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
 import { IFabricBlock } from './IFabricBlock';
 import { IFabricTransaction } from './IFabricTransaction';
+import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 
 export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -38,7 +39,7 @@ export class FabricApiClient extends LoggerWrapper {
         return null;
     }
 
-    public static async createWallet(settings: IFabricApiSettings): Promise<Wallet> {
+    public static async createWallet(settings: IFabricConnectionSettings): Promise<Wallet> {
         let item = new InMemoryWallet();
         await item.import(
             settings.fabricIdentity,
@@ -76,7 +77,7 @@ export class FabricApiClient extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, protected settings: IFabricApiSettings) {
+    constructor(logger: ILogger, protected settings: IFabricConnectionSettings) {
         super(logger);
     }
 
@@ -127,7 +128,7 @@ export class FabricApiClient extends LoggerWrapper {
                 wallet: await this.getWallet(),
                 identity: this.settings.fabricIdentity,
                 clientTlsIdentity: this.settings.fabricTlsIdentity,
-                discovery: { enabled: this.settings.fabricIsDiscoveryEnabled, asLocalhost: true }
+                discovery: { enabled: this.settings.fabricIsDiscoveryEnabled, asLocalhost: this.settings.fabricIsDiscoveryAsLocalhost }
             });
 
             this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
@@ -259,21 +260,4 @@ export class FabricApiClient extends LoggerWrapper {
         }
         this._gateway = value;
     }
-}
-
-export interface IFabricApiSettings {
-    fabricNetworkName: string;
-    fabricChaincodeName: string;
-    fabricIsDiscoveryEnabled: boolean;
-    fabricConnectionSettingsPath: string;
-
-    fabricIdentity: string;
-    fabricIdentityMspId: string;
-    fabricIdentityPrivateKey: string;
-    fabricIdentityCertificate: string;
-
-    fabricTlsIdentity?: string;
-    fabricTlsIdentityMspId?: string;
-    fabricTlsIdentityPrivateKey?: string;
-    fabricTlsIdentityCertificate?: string;
 }

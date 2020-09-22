@@ -142,7 +142,7 @@ export class FabricApiClient extends LoggerWrapper {
         try {
             this.connection = await FabricApiClient.createConnection(this.settings);
         } catch (error) {
-            this.connectionConnectErrorHandler(ExtendedError.create(error, ExtendedError.DEFAULT_ERROR_CODE));
+            this.connectErrorHandler(ExtendedError.create(error, ExtendedError.DEFAULT_ERROR_CODE));
         }
     }
 
@@ -152,15 +152,15 @@ export class FabricApiClient extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
-    protected connectionConnectCompleteHandler = (): void => {
+    protected connectCompleteHandler(): void {
         if (!_.isNil(this.connectionPromise)) {
             this.connectionPromise.resolve();
         }
-    };
+    }
 
-    protected connectionConnectErrorHandler = (error?: ExtendedError): void => {
+    protected connectErrorHandler(error?: ExtendedError): void {
         this.disconnect(error);
-    };
+    }
 
     // --------------------------------------------------------------------------
     //
@@ -230,7 +230,7 @@ export class FabricApiClient extends LoggerWrapper {
     }
 
     public set connection(value: IFabricConnection) {
-        if (value !== this._connection) {
+        if (value === this._connection) {
             return;
         }
         if (!_.isNil(this._connection)) {
@@ -238,13 +238,12 @@ export class FabricApiClient extends LoggerWrapper {
         }
 
         this._connection = value;
+        this._isConnected = !_.isNil(this._connection);
 
-        if (!_.isNil(this._connection)) {
-            this._isConnected = true;
-            this.connectionConnectCompleteHandler();
+        if (this._isConnected) {
+            this.connectCompleteHandler();
         } else {
-            this._isConnected = false;
-            this.connectionConnectErrorHandler();
+            this.connectErrorHandler();
         }
     }
 

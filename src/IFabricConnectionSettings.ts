@@ -1,4 +1,5 @@
 export interface IFabricConnectionSettings {
+    uid?: string;
     fabricNetworkName: string;
     fabricChaincodeName: string;
     fabricIsDiscoveryEnabled: boolean;

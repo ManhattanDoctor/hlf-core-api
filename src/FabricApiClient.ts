@@ -128,12 +128,14 @@ export class FabricApiClient extends LoggerWrapper {
 
     public destroy(): void {
         super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         this.disconnect();
 
-        if (this.observer) {
-            this.observer.complete();
-            this.observer = null;
-        }
+        this.observer.complete();
+        this.observer = null;
     }
 
     protected async reconnect(): Promise<void> {

@@ -71,10 +71,10 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
     }
 
     public destroy(): void {
-        super.destroy();
         if (this.isDestroyed) {
             return;
         }
+        super.destroy();
 
         this.items.clear();
         this._items = null;

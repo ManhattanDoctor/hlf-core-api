@@ -127,10 +127,10 @@ export class FabricApiClient extends LoggerWrapper {
     }
 
     public destroy(): void {
-        super.destroy();
         if (this.isDestroyed) {
             return;
         }
+        super.destroy();
 
         this.disconnect();
 

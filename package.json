@@ -9,7 +9,7 @@
     },
     "license": "ISC",
     "peerDependencies": {
-        "@ts-core/common": "^1.0.147",
+        "@ts-core/common": "^1.0.148",
         "fabric-client": "1.4.7",
         "fabric-network": "1.4.7"
     },

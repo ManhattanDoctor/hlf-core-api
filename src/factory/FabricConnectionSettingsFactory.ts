@@ -81,7 +81,7 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
         }
         super.destroy();
 
-        this.items.clear();
+        this.items.destroy();
         this._items = null;
     }
 

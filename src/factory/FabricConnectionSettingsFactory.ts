@@ -21,6 +21,7 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
 
     constructor(logger: ILogger) {
         super(logger);
+        this._items = this.createCollection();
     }
 
     // --------------------------------------------------------------------------
@@ -28,6 +29,10 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
     //  Protected Methods
     //
     // --------------------------------------------------------------------------
+
+    protected createCollection(): MapCollection<T> {
+        return new MapCollection('uid');
+    }
 
     protected parseItem(item: any): T {
         item.fabricIdentityPrivateKey = AbstractSettingsStorage.parsePEM(item.fabricIdentityPrivateKey);

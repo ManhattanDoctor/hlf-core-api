@@ -1,7 +1,9 @@
 import { PromiseHandler } from '@ts-core/common/promise';
-import { Network, Contract, Wallet, Gateway, InMemoryWallet, X509WalletMixin } from 'fabric-network';
-import { Channel, Block } from 'fabric-client';
+import { Network, Contract, Wallet, Gateway, Wallets, X509Identity, GatewayOptions } from 'fabric-network';
+import { Client, Channel } from 'fabric-common';
+import { Block } from 'fabric-client';
 import * as _ from 'lodash';
+import * as fs from 'fs';
 import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
 import { Subject } from 'rxjs';
@@ -47,33 +49,54 @@ export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
 
     public static async createConnection(settings: IFabricConnectionSettings, wallet?: Wallet): Promise<IFabricConnection> {
-        let gateway = new Gateway();
-        if (_.isNil(wallet)) {
-            wallet = await FabricApiClient.createWallet(settings);
+        let gatewayConfig: Client | Record<string, any> = null;
+        if (_.isString(settings.fabricConnectionSettings)) {
+            gatewayConfig = JSON.parse(await fs.readFileSync(settings.fabricConnectionSettings, { encoding: 'utf-8' }));
+        } else {
+            gatewayConfig = settings.fabricConnectionSettings;
         }
 
-        await gateway.connect(settings.fabricConnectionSettingsPath, {
+        let gatewayOptions: GatewayOptions = {
             wallet,
             identity: settings.fabricIdentity,
             clientTlsIdentity: settings.fabricTlsIdentity,
             discovery: { enabled: settings.fabricIsDiscoveryEnabled, asLocalhost: settings.fabricIsDiscoveryAsLocalhost }
-        });
+        };
+
+        if (_.isNil(wallet)) {
+            wallet = await FabricApiClient.createWallet(settings);
+        }
+
+        let gateway = new Gateway();
+        await gateway.connect(gatewayConfig, gatewayOptions);
 
         let network = await gateway.getNetwork(settings.fabricNetworkName);
-        return { gateway, wallet, network, channel: network.getChannel(), contract: network.getContract(settings.fabricChaincodeName) };
+        let channel = network.getChannel();
+        let contract = network.getContract(settings.fabricChaincodeName);
+        return { gateway, wallet, network, channel, contract };
     }
 
     public static async createWallet(settings: IFabricConnectionSettings): Promise<Wallet> {
-        let item = new InMemoryWallet();
-        await item.import(
-            settings.fabricIdentity,
-            X509WalletMixin.createIdentity(settings.fabricIdentityMspId, settings.fabricIdentityCertificate, settings.fabricIdentityPrivateKey)
-        );
+        let item = await Wallets.newInMemoryWallet();
+        let identity: X509Identity = {
+            type: 'X.509',
+            mspId: settings.fabricIdentityMspId,
+            credentials: {
+                privateKey: settings.fabricIdentityPrivateKey,
+                certificate: settings.fabricIdentityCertificate
+            }
+        };
+        item.put(settings.fabricIdentity, identity);
         if (!_.isNil(settings.fabricTlsIdentity)) {
-            await item.import(
-                settings.fabricTlsIdentity,
-                X509WalletMixin.createIdentity(settings.fabricTlsIdentityMspId, settings.fabricTlsIdentityCertificate, settings.fabricTlsIdentityPrivateKey)
-            );
+            let tlsIdentity: X509Identity = {
+                type: 'X.509',
+                mspId: settings.fabricTlsIdentityMspId,
+                credentials: {
+                    privateKey: settings.fabricTlsIdentityPrivateKey,
+                    certificate: settings.fabricTlsIdentityCertificate
+                }
+            };
+            item.put(settings.fabricTlsIdentity, tlsIdentity);
         }
         return item;
     }
@@ -170,6 +193,7 @@ export class FabricApiClient extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
+    /*
     public async getInfo(channel?: Channel): Promise<IFabricChannelInfo> {
         if (_.isNil(channel)) {
             channel = this.channel;
@@ -182,12 +206,13 @@ export class FabricApiClient extends LoggerWrapper {
             previousBlockHash: item.previousBlockHash.toString('hex')
         };
     }
+ 
 
     public async getBlockNumber(channel?: Channel): Promise<number> {
         let info = await this.getInfo(channel);
         return info.height;
     }
-
+ 
     public async getBlock(block: number | string, channel?: Channel): Promise<IFabricBlock> {
         if (_.isNil(channel)) {
             channel = this.channel;
@@ -220,6 +245,7 @@ export class FabricApiClient extends LoggerWrapper {
         }
         return channel.queryTransaction(id);
     }
+    */
 
     // --------------------------------------------------------------------------
     //

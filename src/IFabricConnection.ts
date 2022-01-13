@@ -1,5 +1,5 @@
 import { Network, Contract, Wallet, Gateway } from 'fabric-network';
-import { Channel } from 'fabric-client';
+import { Channel } from 'fabric-common';
 
 export interface IFabricConnection {
     wallet: Wallet;

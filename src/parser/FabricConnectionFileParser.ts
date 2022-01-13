@@ -31,7 +31,7 @@ export class FabricConnectionFileParser extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
-    public certsPathesToPem(file: any, isNeedRemovePath: boolean = true): any {
+    public certsPathsToPem(file: any, isNeedRemovePath: boolean = true): any {
         for (let name of ['peers', 'orderers']) {
             let section = file[name];
             if (_.isNil(section)) {

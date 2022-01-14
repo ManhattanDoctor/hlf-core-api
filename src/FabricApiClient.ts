@@ -1,19 +1,21 @@
 import { PromiseHandler } from '@ts-core/common/promise';
 import { Network, Contract, Wallet, Gateway, Wallets, X509Identity, GatewayOptions } from 'fabric-network';
 import { Client, Channel } from 'fabric-common';
-import { Block } from 'fabric-client';
 import * as _ from 'lodash';
 import * as fs from 'fs';
 import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
 import { Subject } from 'rxjs';
-import { LoadableEvent } from '@ts-core/common/Loadable';
+import { LoadableEvent } from '@ts-core/common';
 import { IFabricChannelInfo } from './IFabricChannelInfo';
 import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
 import { IFabricBlock } from './IFabricBlock';
 import { IFabricTransaction } from './IFabricTransaction';
 import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 import { IFabricConnection } from './IFabricConnection';
+import { FabricUtil } from '.';
+import { FabricContractQSCC } from './contract';
+import { BlockData } from 'fabric-common';
 
 export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -24,7 +26,7 @@ export class FabricApiClient extends LoggerWrapper {
 
     public static parseBlock(block: Block): void {
         let item: IFabricBlock = block as any;
-        item.hash = block.header.data_hash.toString('hex');
+        item.hash = FabricUtil.fromUintArray(block.header.data_hash);
         item.number = Number(block.header.number);
         item.createdDate = FabricApiClient.getBlockCreatedDate(block);
     }
@@ -56,16 +58,16 @@ export class FabricApiClient extends LoggerWrapper {
             gatewayConfig = settings.fabricConnectionSettings;
         }
 
+        if (_.isNil(wallet)) {
+            wallet = await FabricApiClient.createWallet(settings);
+        }
+
         let gatewayOptions: GatewayOptions = {
             wallet,
             identity: settings.fabricIdentity,
             clientTlsIdentity: settings.fabricTlsIdentity,
             discovery: { enabled: settings.fabricIsDiscoveryEnabled, asLocalhost: settings.fabricIsDiscoveryAsLocalhost }
         };
-
-        if (_.isNil(wallet)) {
-            wallet = await FabricApiClient.createWallet(settings);
-        }
 
         let gateway = new Gateway();
         await gateway.connect(gatewayConfig, gatewayOptions);
@@ -111,6 +113,7 @@ export class FabricApiClient extends LoggerWrapper {
     protected connectionPromise: PromiseHandler<void, ExtendedError>;
 
     protected _connection: IFabricConnection;
+    protected _qsccContract: FabricContractQSCC;
     protected _isConnected: boolean;
 
     // --------------------------------------------------------------------------
@@ -206,7 +209,6 @@ export class FabricApiClient extends LoggerWrapper {
             previousBlockHash: item.previousBlockHash.toString('hex')
         };
     }
- 
 
     public async getBlockNumber(channel?: Channel): Promise<number> {
         let info = await this.getInfo(channel);
@@ -268,6 +270,8 @@ export class FabricApiClient extends LoggerWrapper {
         this._connection = value;
         this._isConnected = !_.isNil(this._connection);
 
+        this._qsccContract = !_.isNil(this._connection) ? new FabricContractQSCC(this) : null;
+
         if (this._isConnected) {
             this.connectCompleteHandler();
         } else {
@@ -294,4 +298,14 @@ export class FabricApiClient extends LoggerWrapper {
     public get gateway(): Gateway {
         return !_.isNil(this.connection) ? this.connection.gateway : null;
     }
+
+    public get qsccContract(): FabricContractQSCC {
+        return this._qsccContract;
+    }
+}
+
+interface Block {
+    data: any;
+    header: any;
+    metadata: any;
 }

@@ -1,5 +1,6 @@
 import { Network, Contract, Wallet, Gateway } from 'fabric-network';
 import { Channel } from 'fabric-common';
+import { FabricContractQSCC } from './contract';
 
 export interface IFabricConnection {
     wallet: Wallet;

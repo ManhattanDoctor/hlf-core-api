@@ -304,7 +304,7 @@ export class FabricApiClient extends LoggerWrapper {
     }
 }
 
-interface Block {
+export interface Block {
     data: any;
     header: any;
     metadata: any;

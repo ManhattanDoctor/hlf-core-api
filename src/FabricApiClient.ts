@@ -16,6 +16,7 @@ import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from '.';
 import { FabricContractQSCC } from './contract';
 import { BlockData } from 'fabric-common';
+import { common as FabricProtoCommon } from 'fabric-protos';
 
 export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -24,11 +25,12 @@ export class FabricApiClient extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
-    public static parseBlock(block: Block): void {
+    public static parseBlock(block: Block): IFabricBlock {
         let item: IFabricBlock = block as any;
         item.hash = FabricUtil.fromUintArray(block.header.data_hash);
         item.number = Number(block.header.number);
         item.createdDate = FabricApiClient.getBlockCreatedDate(block);
+        return item;
     }
 
     public static getBlockCreatedDate(block: Block): Date {
@@ -304,7 +306,7 @@ export class FabricApiClient extends LoggerWrapper {
     }
 }
 
-export interface Block {
+export interface Block extends FabricProtoCommon.IBlock {
     data: any;
     header: any;
     metadata: any;

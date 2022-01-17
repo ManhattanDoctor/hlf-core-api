@@ -24,6 +24,7 @@ export enum FabricTransactionValidationCode {
     BAD_RWSET = 22,
     ILLEGAL_WRITESET = 23,
     INVALID_WRITESET = 24,
+    INVALID_CHAINCODE = 25,
     NOT_VALIDATED = 254,
     INVALID_OTHER_REASON = 255
 }

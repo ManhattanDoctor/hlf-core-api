@@ -55,9 +55,9 @@ export class FabricApiClient extends LoggerWrapper {
     public static async createConnection(settings: IFabricConnectionSettings, wallet?: Wallet): Promise<IFabricConnection> {
         let gatewayConfig: Client | Record<string, any> = null;
         if (_.isString(settings.fabricConnectionSettings)) {
-            gatewayConfig = JSON.parse(await fs.readFileSync(settings.fabricConnectionSettings, { encoding: 'utf-8' }));
+            gatewayConfig = JSON.parse(await fs.readFileSync(settings.fabricConnectionSettings.toString(), { encoding: 'utf-8' }));
         } else {
-            gatewayConfig = settings.fabricConnectionSettings;
+            gatewayConfig = settings.fabricConnectionSettings as Record<string, any>;
         }
 
         if (_.isNil(wallet)) {

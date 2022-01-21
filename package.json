@@ -9,7 +9,7 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "^1.0.187",
+        "@ts-core/common": "^2.0.1",
         "fabric-network": "^2.2.11"
     },
     "devDependencies": {

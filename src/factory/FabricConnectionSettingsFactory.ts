@@ -46,9 +46,12 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
 
     protected parsePem(item: string): string {
         if (!FabricConnectionFileParser.isPem(item)) {
-            item = fs.readFileSync(item, { encoding: 'utf8' });
+            item = FabricConnectionFileParser.pemToOneLine(fs.readFileSync(item, { encoding: 'utf8' }));
         }
-        return AbstractSettingsStorage.parsePEM(item);
+        else {
+            item = AbstractSettingsStorage.parsePEM(item);
+        }
+        return item;
     }
 
     protected isItemValid(item: T): boolean {

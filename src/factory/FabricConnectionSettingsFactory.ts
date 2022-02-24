@@ -1,8 +1,10 @@
 import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 import * as _ from 'lodash';
+import * as fs from 'fs';
 import { MapCollection } from '@ts-core/common/map';
 import { AbstractSettingsStorage } from '@ts-core/common/settings';
 import { IFabricConnectionSettings } from '../IFabricConnectionSettings';
+import { FabricConnectionFileParser } from '../parser';
 
 export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings = IFabricConnectionSettings> extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -35,9 +37,18 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
     }
 
     protected parseItem(item: any): T {
-        item.fabricIdentityPrivateKey = AbstractSettingsStorage.parsePEM(item.fabricIdentityPrivateKey);
-        item.fabricIdentityCertificate = AbstractSettingsStorage.parsePEM(item.fabricIdentityCertificate);
+        // item.fabricIdentityPrivateKey = AbstractSettingsStorage.parsePEM(item.fabricIdentityPrivateKey);
+        // item.fabricIdentityCertificate = AbstractSettingsStorage.parsePEM(item.fabricIdentityCertificate);
+        item.fabricIdentityPrivateKey = this.parsePem(item.fabricIdentityPrivateKey);
+        item.fabricIdentityCertificate = this.parsePem(item.fabricIdentityCertificate);
         return item;
+    }
+
+    protected parsePem(item: string): string {
+        if (!FabricConnectionFileParser.isPem(item)) {
+            item = fs.readFileSync(item, { encoding: 'utf8' });
+        }
+        return AbstractSettingsStorage.parsePEM(item);
     }
 
     protected isItemValid(item: T): boolean {

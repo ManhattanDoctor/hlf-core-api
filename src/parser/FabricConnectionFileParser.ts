@@ -15,6 +15,10 @@ export class FabricConnectionFileParser extends LoggerWrapper {
         return AbstractSettingsStorage.parsePEM(item.substr(1, item.length - 2));
     }
 
+    public static isPem(item: string) {
+        return !_.isNil(item) ? item.indexOf('-----') === 0 : false;
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Constructor

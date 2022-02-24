@@ -10,12 +10,16 @@ export class FabricConnectionFileParser extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
+    public static load(path: string): string {
+        return fs.readFileSync(path, { encoding: 'utf8' });
+    }
+
     public static pemToOneLine(item: string): string {
         item = JSON.stringify(item);
         return AbstractSettingsStorage.parsePEM(item.substr(1, item.length - 2));
     }
 
-    public static isPem(item: string) {
+    public static isPemFormat(item: string) {
         return !_.isNil(item) ? item.indexOf('-----') === 0 : false;
     }
 
@@ -62,7 +66,7 @@ export class FabricConnectionFileParser extends LoggerWrapper {
             return;
         }
         try {
-            item.pem = FabricConnectionFileParser.pemToOneLine(fs.readFileSync(item.path, { encoding: 'utf8' }));
+            item.pem = FabricConnectionFileParser.pemToOneLine(FabricConnectionFileParser.load(item.path));
             if (isNeedRemovePath) {
                 delete item.path;
             }

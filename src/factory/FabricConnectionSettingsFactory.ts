@@ -1,6 +1,5 @@
 import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 import * as _ from 'lodash';
-import * as fs from 'fs';
 import { MapCollection } from '@ts-core/common/map';
 import { AbstractSettingsStorage } from '@ts-core/common/settings';
 import { IFabricConnectionSettings } from '../IFabricConnectionSettings';
@@ -37,21 +36,21 @@ export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings
     }
 
     protected parseItem(item: any): T {
-        // item.fabricIdentityPrivateKey = AbstractSettingsStorage.parsePEM(item.fabricIdentityPrivateKey);
-        // item.fabricIdentityCertificate = AbstractSettingsStorage.parsePEM(item.fabricIdentityCertificate);
         item.fabricIdentityPrivateKey = this.parsePem(item.fabricIdentityPrivateKey);
         item.fabricIdentityCertificate = this.parsePem(item.fabricIdentityCertificate);
+        item.fabricTlsIdentityPrivateKey = this.parsePem(item.fabricTlsIdentityPrivateKey);
+        item.fabricTlsIdentityCertificate = this.parsePem(item.fabricTlsIdentityCertificate);
         return item;
     }
 
     protected parsePem(item: string): string {
-        if (!FabricConnectionFileParser.isPem(item)) {
-            item = FabricConnectionFileParser.pemToOneLine(fs.readFileSync(item, { encoding: 'utf8' }));
+        if (_.isNil(item)) {
+            return null;
         }
-        else {
-            item = AbstractSettingsStorage.parsePEM(item);
+        if (FabricConnectionFileParser.isPemFormat(item)) {
+            return AbstractSettingsStorage.parsePEM(item);
         }
-        return item;
+        return FabricConnectionFileParser.pemToOneLine(FabricConnectionFileParser.load(item));
     }
 
     protected isItemValid(item: T): boolean {

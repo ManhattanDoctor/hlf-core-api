@@ -1,6 +1,3 @@
-link:
-	gulp --cwd node_modules/gulp-npm-module-publisher link
-
 build:
 	gulp --cwd node_modules/gulp-npm-module-publisher build
 

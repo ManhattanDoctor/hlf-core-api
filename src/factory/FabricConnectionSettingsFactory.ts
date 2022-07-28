@@ -1,7 +1,7 @@
-import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
+import { ILogger, LoggerWrapper } from '@ts-core/common';
 import * as _ from 'lodash';
-import { MapCollection } from '@ts-core/common/map';
-import { AbstractSettingsStorage } from '@ts-core/common/settings';
+import { MapCollection } from '@ts-core/common';
+import { AbstractSettingsStorage } from '@ts-core/common';
 import { IFabricConnectionSettings } from '../IFabricConnectionSettings';
 import { FabricConnectionFileParser } from '../parser';
 

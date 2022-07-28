@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { IFabricBlock } from '../IFabricBlock';
 import { BlockDecoder } from 'fabric-common/index.js';
 import { FabricUtil } from '../FabricUtil';
-import { IFabricTransaction } from '..';
+import { IFabricTransaction } from '../IFabricTransaction';
 
 export class FabricContractQSCC extends FabricContract {
     // --------------------------------------------------------------------------

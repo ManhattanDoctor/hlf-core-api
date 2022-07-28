@@ -10,8 +10,8 @@ export class FabricConnectionFileParser extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
-    public static load(path: string): string {
-        return fs.readFileSync(path, { encoding: 'utf8' });
+    public static load(path: string, encoding: BufferEncoding = 'utf8'): string {
+        return fs.readFileSync(path, { encoding });
     }
 
     public static pemToOneLine(item: string): string {

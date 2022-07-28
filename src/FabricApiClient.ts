@@ -15,8 +15,8 @@ import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from '.';
 import { FabricContractQSCC } from './contract';
-import { BlockData } from 'fabric-common';
 import { common as FabricProtoCommon } from 'fabric-protos';
+import { FabricConnectionFileParser } from './parser';
 
 export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -55,7 +55,7 @@ export class FabricApiClient extends LoggerWrapper {
     public static async createConnection(settings: IFabricConnectionSettings, wallet?: Wallet): Promise<IFabricConnection> {
         let gatewayConfig: Client | Record<string, any> = null;
         if (_.isString(settings.fabricConnectionSettings)) {
-            gatewayConfig = JSON.parse(await fs.readFileSync(settings.fabricConnectionSettings.toString(), { encoding: 'utf-8' }));
+            gatewayConfig = JSON.parse(FabricConnectionFileParser.load(settings.fabricConnectionSettings));
         } else {
             gatewayConfig = settings.fabricConnectionSettings as Record<string, any>;
         }

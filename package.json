@@ -17,7 +17,7 @@
     "license": "ISC",
     "dependencies": {
         "@ts-core/common": "^3.0.3",
-        "fabric-network": "^2.2.14"
+        "fabric-network": "2.2.11"
     },
     "devDependencies": {
         "gulp-npm-module-publisher": "^3.0.0"

@@ -186,65 +186,6 @@ export class FabricApiClient extends LoggerWrapper {
 
     // --------------------------------------------------------------------------
     //
-    // 	Public Methods
-    //
-    // --------------------------------------------------------------------------
-
-    /*
-    public async getInfo(channel?: Channel): Promise<IFabricChannelInfo> {
-        if (_.isNil(channel)) {
-            channel = this.channel;
-        }
-
-        let item = await channel.queryInfo();
-        return {
-            height: item.height.toNumber(),
-            currentBlockHash: item.currentBlockHash.toString('hex'),
-            previousBlockHash: item.previousBlockHash.toString('hex')
-        };
-    }
-
-    public async getBlockNumber(channel?: Channel): Promise<number> {
-        let info = await this.getInfo(channel);
-        return info.height;
-    }
- 
-    public async getBlock(block: number | string, channel?: Channel): Promise<IFabricBlock> {
-        if (_.isNil(channel)) {
-            channel = this.channel;
-        }
-
-        let item: Block = null;
-        if (_.isString(block)) {
-            item = await channel.queryBlockByHash(Buffer.from(block, 'hex'));
-        } else if (_.isNumber(block)) {
-            item = await channel.queryBlock(block);
-        } else {
-            throw new ExtendedError(`Invalid block: value must be string or number`);
-        }
-        FabricApiClient.parseBlock(item);
-        return item as IFabricBlock;
-    }
-
-    public async getBlockByTxID(id: string, channel?: Channel): Promise<IFabricBlock> {
-        if (_.isNil(channel)) {
-            channel = this.channel;
-        }
-        let item = await channel.queryBlockByTxID(id);
-        FabricApiClient.parseBlock(item);
-        return item as IFabricBlock;
-    }
-
-    public async getTransaction(id: string, channel?: Channel): Promise<IFabricTransaction> {
-        if (_.isNil(channel)) {
-            channel = this.channel;
-        }
-        return channel.queryTransaction(id);
-    }
-    */
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Properties
     //
     // --------------------------------------------------------------------------

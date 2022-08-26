@@ -1,6 +1,8 @@
-import { Block } from './FabricApiClient';
+export interface IFabricBlock {
+    data: any;
+    header: any;
+    metadata: any;
 
-export interface IFabricBlock extends Block {
     hash: string;
     number: number;
     createdDate: Date;

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { MapCollection } from '@ts-core/common';
 import { AbstractSettingsStorage } from '@ts-core/common';
 import { IFabricConnectionSettings } from '../IFabricConnectionSettings';
-import { FabricConnectionFileParser } from '../parser';
+import { FabricConnectionFileParser } from '../parser/FabricConnectionFileParser';
 
 export class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings = IFabricConnectionSettings> extends LoggerWrapper {
     // --------------------------------------------------------------------------

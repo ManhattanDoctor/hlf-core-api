@@ -1,5 +1,4 @@
-import { ILogger, LoggerWrapper } from '@ts-core/common';
-import { AbstractSettingsStorage } from '@ts-core/common';
+import { ILogger, LoggerWrapper, AbstractSettingsStorage } from '@ts-core/common';
 import * as _ from 'lodash';
 import * as fs from 'fs';
 

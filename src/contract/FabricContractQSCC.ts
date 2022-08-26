@@ -3,11 +3,11 @@ import { FabricContract } from './FabricContract';
 import { Channel } from 'fabric-common';
 import { IFabricChannelInfo } from '../IFabricChannelInfo';
 import { common as FabricProtoCommon } from 'fabric-protos';
-import * as _ from 'lodash';
 import { IFabricBlock } from '../IFabricBlock';
 import { BlockDecoder } from 'fabric-common/index.js';
 import { FabricUtil } from '../FabricUtil';
 import { IFabricTransaction } from '../IFabricTransaction';
+import * as _ from 'lodash';
 
 export class FabricContractQSCC extends FabricContract {
     // --------------------------------------------------------------------------

@@ -10,8 +10,8 @@ export * from './IFabricTransaction';
 //
 export * from './contract/FabricContract';
 export * from './contract/FabricContractQSCC';
-//
-// export * from './factory/FabricApiClientFactory';
-// export * from './factory/FabricConnectionSettingsFactory';
+
+export * from './factory/FabricApiClientFactory';
+export * from './factory/FabricConnectionSettingsFactory';
 //
 export * from './parser/FabricConnectionFileParser';

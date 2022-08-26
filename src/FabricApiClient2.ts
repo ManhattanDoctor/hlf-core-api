@@ -1,15 +1,8 @@
-import { PromiseHandler, LoggerWrapper, ILogger, ExtendedError, ObservableData, LoadableEvent, } from '@ts-core/common';
-import { Network, Contract, Wallet, Gateway, Wallets, X509Identity, GatewayOptions } from 'fabric-network';
-import { Client, Channel } from 'fabric-common';
+import { LoggerWrapper, } from '@ts-core/common';
 import * as _ from 'lodash';
-import { Subject } from 'rxjs';
-import { IFabricBlock } from './IFabricBlock';
-import { IFabricConnectionSettings } from './IFabricConnectionSettings';
-import { IFabricConnection } from './IFabricConnection';
+import { Block, IFabricBlock } from './IFabricBlock';
 import { FabricUtil } from './FabricUtil';
 // import { FabricContractQSCC } from './contract/FabricContractQSCC';
-import { FabricConnectionFileParser } from './parser/FabricConnectionFileParser';
-import { Block } from './FabricApiClient';
 
 
 export class FabricApiClient2 extends LoggerWrapper {

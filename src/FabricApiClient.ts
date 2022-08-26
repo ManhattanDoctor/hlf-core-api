@@ -3,7 +3,7 @@ import { Network, Contract, Wallet, Gateway, Wallets, X509Identity, GatewayOptio
 import { Client, Channel } from 'fabric-common';
 import * as _ from 'lodash';
 import { Subject } from 'rxjs';
-import { IFabricBlock } from './IFabricBlock';
+import { Block, IFabricBlock } from './IFabricBlock';
 import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from './FabricUtil';
@@ -244,9 +244,3 @@ export class FabricApiClient extends LoggerWrapper {
 
 // import { common as FabricProtoCommon } from 'fabric-protos';
 // export interface Block extends FabricProtoCommon.IBlock
-
-export interface Block {
-    data: any;
-    header: any;
-    metadata: any;
-}

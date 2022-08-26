@@ -1,12 +1,12 @@
 import { FabricApiClient } from '../FabricApiClient';
 import { FabricContract } from './FabricContract';
-import { Channel } from 'fabric-common';
 import { IFabricChannelInfo } from '../IFabricChannelInfo';
-import { common as FabricProtoCommon } from 'fabric-protos';
 import { IFabricBlock } from '../IFabricBlock';
-import { BlockDecoder } from 'fabric-common/index.js';
 import { FabricUtil } from '../FabricUtil';
 import { IFabricTransaction } from '../IFabricTransaction';
+import { common as FabricProtoCommon } from 'fabric-protos';
+import { BlockDecoder } from 'fabric-common/index.js';
+import { Channel } from 'fabric-common';
 import * as _ from 'lodash';
 
 export class FabricContractQSCC extends FabricContract {

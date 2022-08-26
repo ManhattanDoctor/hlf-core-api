@@ -9,10 +9,11 @@ import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from './FabricUtil';
 // import { FabricContractQSCC } from './contract/FabricContractQSCC';
 import { FabricConnectionFileParser } from './parser/FabricConnectionFileParser';
+import { Block } from './FabricApiClient';
 
 
 export class FabricApiClient2 extends LoggerWrapper {
-    /*
+
     // --------------------------------------------------------------------------
     //
     // 	Block Static Methods
@@ -23,7 +24,7 @@ export class FabricApiClient2 extends LoggerWrapper {
         let item: IFabricBlock = block as any;
         item.hash = FabricUtil.fromUintArray(block.header.data_hash);
         item.number = Number(block.header.number);
-        item.createdDate = FabricApiClient.getBlockCreatedDate(block);
+        item.createdDate = FabricApiClient2.getBlockCreatedDate(block);
         return item;
     }
 
@@ -39,7 +40,7 @@ export class FabricApiClient2 extends LoggerWrapper {
         }
         return null;
     }
-
+    /*
     // --------------------------------------------------------------------------
     //
     // 	Connection Static Methods

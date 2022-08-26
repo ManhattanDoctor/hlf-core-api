@@ -118,6 +118,7 @@ export class FabricApiClient extends LoggerWrapper {
 
     constructor(logger: ILogger, protected settings: IFabricConnectionSettings) {
         super(logger);
+        console.log("Hi am new");
     }
 
     // --------------------------------------------------------------------------

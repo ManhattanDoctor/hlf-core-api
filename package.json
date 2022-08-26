@@ -2,14 +2,7 @@
     "name": "@hlf-core/api",
     "version": "3.0.6",
     "description": "Hyperledger Fabric API",
-    "main": "./cjs/public-api.js",
-    "module": "./esm/public-api.js",
-    "exports": {
-        ".": {
-            "import": "./esm/public-api.js",
-            "require": "./cjs/public-api.js"
-        }
-    },
+    "main": "index.js",
     "author": {
         "name": "Renat Gubaev",
         "email": "renat.gubaev@gmail.com"
@@ -20,7 +13,7 @@
         "fabric-network": "^2.2.11"
     },
     "devDependencies": {
-        "gulp-npm-module-publisher": "^3.0.0"
+        "gulp-npm-publisher": "^1.0.3"
     },
     "repository": {
         "type": "git",
@@ -32,5 +25,9 @@
     "bugs": {
         "url": "https://github.com/ManhattanDoctor/hlf-core-api/issues"
     },
-    "homepage": "https://github.com/ManhattanDoctor/hlf-core-api#readme"
+    "homepage": "https://github.com/ManhattanDoctor/hlf-core-api#readme",
+    "dependencies": {
+        "@ts-core/common": "^3.0.7",
+        "fabric-network": "^2.2.11"
+    }
 }

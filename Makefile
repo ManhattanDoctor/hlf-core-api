@@ -1,17 +1,17 @@
 build:
-	gulp --cwd node_modules/gulp-npm-module-publisher build
+	gulp --cwd node_modules/gulp-npm-publisher build
 
 clean:
-	gulp --cwd node_modules/gulp-npm-module-publisher clean
+	gulp --cwd node_modules/gulp-npm-publisher clean
 
 publish:
-	gulp --cwd node_modules/gulp-npm-module-publisher publish
+	gulp --cwd node_modules/gulp-npm-publisher publish
 
 publish_patch:
-	gulp --cwd node_modules/gulp-npm-module-publisher publish:patch
+	gulp --cwd node_modules/gulp-npm-publisher publish:patch
 
 publish_minor:
-	gulp --cwd node_modules/gulp-npm-module-publisher publish:minor
+	gulp --cwd node_modules/gulp-npm-publisher publish:minor
 
 publish_major:
-	gulp --cwd node_modules/gulp-npm-module-publisher publish:major
+	gulp --cwd node_modules/gulp-npm-publisher publish:major

@@ -1,6 +1,6 @@
 {
     "name": "@hlf-core/api",
-    "version": "3.0.12",
+    "version": "3.0.13",
     "description": "Hyperledger Fabric API",
     "main": "index.js",
     "author": {

@@ -10,6 +10,7 @@ import { FabricUtil } from './FabricUtil';
 // import { FabricContractQSCC } from './contract/FabricContractQSCC';
 import { FabricConnectionFileParser } from './parser/FabricConnectionFileParser';
 
+
 export class FabricApiClient2 extends LoggerWrapper {
     /*
     // --------------------------------------------------------------------------

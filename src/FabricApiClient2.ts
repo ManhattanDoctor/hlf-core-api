@@ -4,7 +4,6 @@ import { Block, IFabricBlock } from './IFabricBlock';
 import { FabricUtil } from './FabricUtil';
 // import { FabricContractQSCC } from './contract/FabricContractQSCC';
 
-
 export class FabricApiClient2 extends LoggerWrapper {
 
     // --------------------------------------------------------------------------
@@ -13,6 +12,7 @@ export class FabricApiClient2 extends LoggerWrapper {
     //
     // --------------------------------------------------------------------------
 
+    /*
     public static parseBlock(block: Block): IFabricBlock {
         let item: IFabricBlock = block as any;
         item.hash = FabricUtil.fromUintArray(block.header.data_hash);
@@ -33,7 +33,7 @@ export class FabricApiClient2 extends LoggerWrapper {
         }
         return null;
     }
-    /*
+    
     // --------------------------------------------------------------------------
     //
     // 	Connection Static Methods

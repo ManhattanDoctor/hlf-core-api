@@ -8,7 +8,6 @@ import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from './FabricUtil';
 import { FabricContractQSCC } from './contract/FabricContractQSCC';
-import { common as FabricProtoCommon } from 'fabric-protos';
 import { FabricConnectionFileParser } from './parser/FabricConnectionFileParser';
 
 export class FabricApiClient extends LoggerWrapper {
@@ -299,7 +298,10 @@ export class FabricApiClient extends LoggerWrapper {
     }
 }
 
-export interface Block extends FabricProtoCommon.IBlock {
+// import { common as FabricProtoCommon } from 'fabric-protos';
+// export interface Block extends FabricProtoCommon.IBlock
+
+export interface Block {
     data: any;
     header: any;
     metadata: any;

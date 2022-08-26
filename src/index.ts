@@ -8,6 +8,8 @@ export * from './IFabricConnection';
 export * from './IFabricConnectionSettings';
 export * from './IFabricTransaction';
 
+export * from './FabricApiClient2';
+
 /*
 //
 export * from './contract/FabricContract';

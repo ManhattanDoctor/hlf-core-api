@@ -25,9 +25,5 @@
     "bugs": {
         "url": "https://github.com/ManhattanDoctor/hlf-core-api/issues"
     },
-    "homepage": "https://github.com/ManhattanDoctor/hlf-core-api#readme",
-    "dependencies": {
-        "@ts-core/common": "^3.0.7",
-        "fabric-network": "^2.2.11"
-    }
+    "homepage": "https://github.com/ManhattanDoctor/hlf-core-api#readme"
 }

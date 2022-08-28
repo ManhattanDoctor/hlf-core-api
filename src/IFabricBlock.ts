@@ -1,8 +1,4 @@
-export interface Block {
-    data: any;
-    header: any;
-    metadata: any;
-}
+import { Block } from "./Block";
 
 export interface IFabricBlock extends Block {
     hash: string;

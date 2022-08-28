@@ -3,11 +3,12 @@ import { Network, Contract, Wallet, Gateway, Wallets, X509Identity, GatewayOptio
 import { Client, Channel } from 'fabric-common';
 import * as _ from 'lodash';
 import { Subject } from 'rxjs';
-import { Block, IFabricBlock } from './IFabricBlock';
+import { Block } from './Block';
+import { IFabricBlock } from './IFabricBlock';
 import { IFabricConnectionSettings } from './IFabricConnectionSettings';
 import { IFabricConnection } from './IFabricConnection';
 import { FabricUtil } from './FabricUtil';
-// import { FabricContractQSCC } from './contract/FabricContractQSCC';
+import { FabricContractQSCC } from './contract/FabricContractQSCC';
 import { FabricConnectionFileParser } from './parser/FabricConnectionFileParser';
 
 export class FabricApiClient extends LoggerWrapper {
@@ -107,7 +108,7 @@ export class FabricApiClient extends LoggerWrapper {
     protected connectionPromise: PromiseHandler<void, ExtendedError>;
 
     protected _connection: IFabricConnection;
-    // protected _qsccContract: FabricContractQSCC;
+    protected _qsccContract: FabricContractQSCC;
     protected _isConnected: boolean;
 
     // --------------------------------------------------------------------------
@@ -118,7 +119,6 @@ export class FabricApiClient extends LoggerWrapper {
 
     constructor(logger: ILogger, protected settings: IFabricConnectionSettings) {
         super(logger);
-        console.log("Hi am new");
     }
 
     // --------------------------------------------------------------------------
@@ -206,7 +206,7 @@ export class FabricApiClient extends LoggerWrapper {
         this._connection = value;
         this._isConnected = !_.isNil(this._connection);
 
-        // this._qsccContract = !_.isNil(this._connection) ? new FabricContractQSCC(this) : null;
+        this._qsccContract = !_.isNil(this._connection) ? new FabricContractQSCC(this) : null;
 
         if (this._isConnected) {
             this.connectCompleteHandler();
@@ -235,12 +235,7 @@ export class FabricApiClient extends LoggerWrapper {
         return !_.isNil(this.connection) ? this.connection.gateway : null;
     }
 
-    /*
     public get qsccContract(): FabricContractQSCC {
         return this._qsccContract;
     }
-    */
 }
-
-// import { common as FabricProtoCommon } from 'fabric-protos';
-// export interface Block extends FabricProtoCommon.IBlock

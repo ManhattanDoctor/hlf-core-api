@@ -22,11 +22,11 @@ export class FabricApiClient extends LoggerWrapper {
         let item: IFabricBlock = block as any;
         item.hash = FabricUtil.fromUintArray(block.header.data_hash);
         item.number = Number(block.header.number);
-        item.createdDate = FabricApiClient.getBlockCreatedDate(block);
+        item.date = FabricApiClient.getBlockDate(block);
         return item;
     }
 
-    public static getBlockCreatedDate(block: Block): Date {
+    public static getBlockDate(block: Block): Date {
         if (_.isNil(block.data) || _.isEmpty(block.data.data)) {
             return null;
         }

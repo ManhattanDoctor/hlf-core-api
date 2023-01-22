@@ -15,12 +15,12 @@
         "email": "renat.gubaev@gmail.com"
     },
     "license": "ISC",
-    "peerDependencies": {
-        "@ts-core/common": "^3.0.7",
-        "fabric-network": "^2.2.16"
+    "dependencies": {
+        "@ts-core/common": "~3.0.7",
+        "fabric-network": "2.2.16"
     },
     "devDependencies": {
-        "gulp-npm-module-publisher": "^3.0.0"
+        "gulp-npm-module-publisher": "~3.0.0"
     },
     "repository": {
         "type": "git",

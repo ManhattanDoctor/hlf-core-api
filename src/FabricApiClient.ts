@@ -205,7 +205,6 @@ export class FabricApiClient extends LoggerWrapper {
 
         this._connection = value;
         this._isConnected = !_.isNil(this._connection);
-
         this._qsccContract = !_.isNil(this._connection) ? new FabricContractQSCC(this) : null;
 
         if (this._isConnected) {

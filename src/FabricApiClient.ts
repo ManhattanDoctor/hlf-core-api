@@ -119,6 +119,7 @@ export class FabricApiClient extends LoggerWrapper {
 
     constructor(logger: ILogger, protected settings: IFabricConnectionSettings) {
         super(logger);
+        this.observer = new Subject();
     }
 
     // --------------------------------------------------------------------------
@@ -155,8 +156,9 @@ export class FabricApiClient extends LoggerWrapper {
 
         this.disconnect();
 
-        this.observer.complete();
-        this.observer = null;
+        if (!_.isNil(this.observer)) {
+            this.observer.complete();
+        }
     }
 
     protected async reconnect(): Promise<void> {

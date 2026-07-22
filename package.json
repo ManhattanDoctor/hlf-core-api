@@ -16,11 +16,11 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "~3.0.7",
+        "@ts-core/common": "~3.0.11",
         "fabric-network": "2.2.16"
     },
     "devDependencies": {
-        "gulp-npm-module-publisher": "~3.0.0"
+        "gulp-npm-module-publisher": "~3.0.5"
     },
     "repository": {
         "type": "git",

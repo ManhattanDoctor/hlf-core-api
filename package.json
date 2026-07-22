@@ -1,6 +1,6 @@
 {
     "name": "@hlf-core/api",
-    "version": "3.1.6",
+    "version": "3.1.7",
     "description": "TypeScript library for Hyperledger Fabric connectivity: gateway client, qscc system contract, block parsing and connection settings",
     "main": "./cjs/public-api.js",
     "module": "./esm/public-api.js",

@@ -20,7 +20,7 @@
         "fabric-network": "2.2.16"
     },
     "devDependencies": {
-        "gulp-npm-module-publisher": "~3.0.5"
+        "gulp-npm-module-publisher": "^3.0.6"
     },
     "repository": {
         "type": "git",
@@ -40,5 +40,5 @@
     "bugs": {
         "url": "https://github.com/ManhattanDoctor/hlf-core-api/issues"
     },
-    "homepage": "https://github.com/ManhattanDoctor/hlf-core-api#readme"
+    "homepage": "https://hlf.gnosisai.ru/docs/packages/api"
 }

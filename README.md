@@ -1,27 +1,32 @@
+**English** · [Русский](./README.ru.md)
+
 # @hlf-core/api
 
-> TypeScript библиотека для подключения к Hyperledger Fabric: клиент, системный контракт qscc, разбор блоков и настройки
+> TypeScript library for connecting to Hyperledger Fabric: client, qscc system contract, block parsing and settings
 
 [![npm version](https://img.shields.io/npm/v/@hlf-core/api.svg)](https://www.npmjs.com/package/@hlf-core/api)
+[![Docs](https://img.shields.io/badge/docs-hlf.gnosisai.ru-1f6feb)](https://hlf.gnosisai.ru/docs/packages/api)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
-Нижний уровень работы с сетью: подключение через `fabric-network`, доступ к каналу и контрактам, запросы к системному контракту `qscc` и разбор структур блока.
+Full documentation: https://hlf.gnosisai.ru/docs/packages/api
 
-Пакет не знает ни о командах, ни о протоколе транспорта — он отвечает только за соединение и за то, чтобы сырые данные Fabric стали пригодны для использования. Поверх него работает [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport).
+The low-level network layer: connecting through `fabric-network`, access to the channel and contracts, queries to the `qscc` system contract and parsing of block structures.
 
-## Содержание
+The package knows nothing about commands or the transport protocol — it is responsible only for the connection and for turning Fabric's raw data into something usable. [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport) runs on top of it.
 
-- [Описание](#описание)
-  - [Основные возможности](#основные-возможности)
-- [Установка](#установка)
-  - [Зависимости](#зависимости)
-- [Быстрый старт](#быстрый-старт)
-- [Как это работает](#как-это-работает)
-  - [Подключение](#подключение)
-  - [Кошелёк и идентичность](#кошелёк-и-идентичность)
-  - [Профиль подключения](#профиль-подключения)
-  - [Работа с блоками](#работа-с-блоками)
-- [API документация](#api-документация)
+## Table of Contents
+
+- [Overview](#overview)
+  - [Key Features](#key-features)
+- [Installation](#installation)
+  - [Dependencies](#dependencies)
+- [Quick Start](#quick-start)
+- [How It Works](#how-it-works)
+  - [Connection](#connection)
+  - [Wallet and Identity](#wallet-and-identity)
+  - [Connection Profile](#connection-profile)
+  - [Working with Blocks](#working-with-blocks)
+- [API Reference](#api-reference)
   - [FabricApiClient](#fabricapiclient)
   - [IFabricConnectionSettings](#ifabricconnectionsettings)
   - [FabricContractQSCC](#fabriccontractqscc)
@@ -29,33 +34,33 @@
   - [FabricTransactionValidationCode](#fabrictransactionvalidationcode)
   - [FabricUtil](#fabricutil)
   - [FabricConnectionFileParser](#fabricconnectionfileparser)
-  - [Фабрики](#фабрики)
-- [Примеры использования](#примеры-использования)
-- [Важные особенности](#важные-особенности)
-- [Структура проекта](#структура-проекта)
-- [Связанные пакеты](#связанные-пакеты)
+  - [Factories](#factories)
+- [Usage Examples](#usage-examples)
+- [Important Notes](#important-notes)
+- [Project Structure](#project-structure)
+- [Related Packages](#related-packages)
 
-## Описание
+## Overview
 
-Работа с Fabric из Node.js требует много подготовки: собрать профиль подключения, положить ключи в кошелёк, поднять шлюз, получить сеть, канал и контракт, а для чтения блоков — ещё и обратиться к системному контракту и декодировать протобуф. `@hlf-core/api` прячет это за одним объектом с понятными свойствами.
+Working with Fabric from Node.js takes a lot of setup: assemble the connection profile, put the keys into a wallet, bring up a gateway, obtain the network, channel and contract, and — to read blocks — also call the system contract and decode protobuf. `@hlf-core/api` hides all of this behind a single object with clear properties.
 
-### Основные возможности
+### Key Features
 
-- **Подключение одним вызовом** — `connect()` собирает кошелёк, шлюз, сеть, канал и контракт из настроек
-- **Доступ к сети** — `network`, `channel`, `contract`, `gateway` как свойства клиента
-- **Системный контракт qscc** — высота цепи, блок по номеру, хэшу или идентификатору транзакции, транзакция по идентификатору
-- **Разбор блоков** — декодирование протобуфа и дополнение блока хэшем, номером и датой
-- **Работа с сертификатами** — загрузка PEM из файлов и подстановка их в профиль подключения
-- **Коды валидации** — полный перечень `FabricTransactionValidationCode`
-- **Фабрики** — переиспользование клиентов и хранение настроек нескольких подключений
+- **Connect in a single call** — `connect()` assembles the wallet, gateway, network, channel and contract from the settings
+- **Network access** — `network`, `channel`, `contract`, `gateway` as properties of the client
+- **qscc system contract** — chain height, block by number, hash or transaction id, transaction by id
+- **Block parsing** — decoding protobuf and enriching a block with its hash, number and date
+- **Working with certificates** — loading PEM from files and injecting it into the connection profile
+- **Validation codes** — the complete `FabricTransactionValidationCode` set
+- **Factories** — reusing clients and storing settings for multiple connections
 
-## Установка
+## Installation
 
 ```bash
 npm install @hlf-core/api
 ```
 
-### Зависимости
+### Dependencies
 
 ```json
 {
@@ -64,9 +69,9 @@ npm install @hlf-core/api
 }
 ```
 
-Версия `fabric-network` зафиксирована точно — она определяет совместимость с версией сети.
+The `fabric-network` version is pinned exactly — it determines compatibility with the network version.
 
-## Быстрый старт
+## Quick Start
 
 ```ts
 import { FabricApiClient } from '@hlf-core/api';
@@ -86,24 +91,24 @@ let api = new FabricApiClient(logger, {
 
 await api.connect();
 
-// вызов chaincode
+// chaincode call
 let result = await api.contract.evaluateTransaction('myFunction', 'arg');
 
-// чтение блока
+// reading a block
 let block = await api.qsccContract.getBlock(42);
 console.log(block.number, block.hash, block.date);
 ```
 
-## Как это работает
+## How It Works
 
-### Подключение
+### Connection
 
-`connect()` создаёт соединение и возвращает промис, который разрешается при успехе:
+`connect()` establishes the connection and returns a promise that resolves on success:
 
 ```ts
 public static async createConnection(settings: IFabricConnectionSettings, wallet?: Wallet): Promise<IFabricConnection> {
-    // профиль: путь к файлу либо готовый объект
-    // кошелёк: создаётся из настроек, если не передан
+    // profile: a file path or a ready object
+    // wallet: created from settings if not provided
     let gateway = new Gateway();
     await gateway.connect(gatewayConfig, gatewayOptions);
 
@@ -114,7 +119,7 @@ public static async createConnection(settings: IFabricConnectionSettings, wallet
 }
 ```
 
-Результат складывается в свойство `connection`, и его сеттер выполняет всю остальную работу: отключает предыдущий шлюз, если он был, создаёт клиент системного контракта `qscc` и разрешает либо отклоняет промис подключения.
+The result is stored in the `connection` property, and its setter does all the remaining work: it disconnects the previous gateway if there was one, creates the `qscc` system contract client and resolves or rejects the connection promise.
 
 ```ts
 public set connection(value: IFabricConnection) {
@@ -128,11 +133,11 @@ public set connection(value: IFabricConnection) {
 }
 ```
 
-Отсюда следует, что `disconnect()` — это просто присвоение `connection = null`: шлюз закрывается, флаг сбрасывается, qscc обнуляется.
+It follows that `disconnect()` is simply assigning `connection = null`: the gateway closes, the flag is reset, qscc is cleared.
 
-### Кошелёк и идентичность
+### Wallet and Identity
 
-Если кошелёк не передан явно, он создаётся в памяти из настроек:
+If a wallet is not passed explicitly, it is created in memory from the settings:
 
 ```ts
 public static async createWallet(settings: IFabricConnectionSettings): Promise<Wallet> {
@@ -150,24 +155,24 @@ public static async createWallet(settings: IFabricConnectionSettings): Promise<W
 }
 ```
 
-Ключи не пишутся на диск — приложение хранит их так, как считает нужным, и передаёт в настройках. При наличии `fabricTlsIdentity` в кошелёк кладётся вторая идентичность, для взаимного TLS.
+Keys are never written to disk — the application stores them however it sees fit and passes them in the settings. If `fabricTlsIdentity` is present, a second identity is placed into the wallet for mutual TLS.
 
-### Профиль подключения
+### Connection Profile
 
-`fabricConnectionSettings` принимает три формы: путь к файлу профиля, готовый объект или экземпляр `Client`. Файл читается и разбирается при подключении.
+`fabricConnectionSettings` accepts three forms: a path to a profile file, a ready object, or a `Client` instance. A file is read and parsed on connect.
 
-В профиле сертификаты обычно указаны путями. `FabricConnectionFileParser.certsPathsToPem` подставляет вместо путей само содержимое, чтобы профиль стал самодостаточным:
+In a profile, certificates are usually specified as paths. `FabricConnectionFileParser.certsPathsToPem` substitutes the content itself for the paths so that the profile becomes self-contained:
 
 ```ts
 let parser = new FabricConnectionFileParser(logger);
 let profile = parser.certsPathsToPem(JSON.parse(content));
 ```
 
-Обрабатываются секции `peers` и `orderers`; если файл сертификата прочитать не удалось, выводится предупреждение, но подключение не прерывается.
+The `peers` and `orderers` sections are processed; if a certificate file cannot be read, a warning is emitted, but the connection is not aborted.
 
-### Работа с блоками
+### Working with Blocks
 
-Блок, приходящий из Fabric, — это дерево протобуфа без удобных полей. `parseBlock` дополняет его тремя:
+A block coming from Fabric is a protobuf tree without convenient fields. `parseBlock` enriches it with three:
 
 ```ts
 public static parseBlock(block: Block): IFabricBlock {
@@ -179,11 +184,11 @@ public static parseBlock(block: Block): IFabricBlock {
 }
 ```
 
-Дата берётся из заголовка первой транзакции блока — в самом блоке её нет. Если данных нет, дата будет `null`.
+The date is taken from the header of the block's first transaction — the block itself does not contain it. If there is no data, the date will be `null`.
 
-Чтение исторических блоков идёт через системный контракт `qscc`, который есть в любой сети: он возвращает протобуф, а библиотека декодирует его через `BlockDecoder` и прогоняет через тот же `parseBlock`.
+Reading historical blocks goes through the `qscc` system contract, which exists in every network: it returns protobuf, and the library decodes it with `BlockDecoder` and runs it through the same `parseBlock`.
 
-## API документация
+## API Reference
 
 ### FabricApiClient
 
@@ -191,30 +196,30 @@ public static parseBlock(block: Block): IFabricBlock {
 class FabricApiClient extends LoggerWrapper
 ```
 
-| Метод | Назначение |
+| Method | Purpose |
 |---|---|
-| `connect(): Promise<void>` | подключение; повторный вызов возвращает тот же промис |
-| `disconnect(error?): void` | отключение шлюза и сброс состояния |
-| `destroy(): void` | уничтожение клиента |
+| `connect(): Promise<void>` | connect; a repeated call returns the same promise |
+| `disconnect(error?): void` | disconnect the gateway and reset state |
+| `destroy(): void` | destroy the client |
 
-| Свойство | Тип | Назначение |
+| Property | Type | Purpose |
 |---|---|---|
-| `isConnected` | `boolean` | состояние подключения |
-| `network` | `Network` | сеть канала |
-| `channel` | `Channel` | канал |
-| `contract` | `Contract` | контракт из настроек |
-| `gateway` | `Gateway` | шлюз `fabric-network` |
-| `qsccContract` | `FabricContractQSCC` | системный контракт для чтения блоков |
-| `connection` | `IFabricConnection` | всё перечисленное одним объектом |
+| `isConnected` | `boolean` | connection state |
+| `network` | `Network` | the channel's network |
+| `channel` | `Channel` | the channel |
+| `contract` | `Contract` | the contract from the settings |
+| `gateway` | `Gateway` | the `fabric-network` gateway |
+| `qsccContract` | `FabricContractQSCC` | system contract for reading blocks |
+| `connection` | `IFabricConnection` | all of the above as a single object |
 
-Статические методы:
+Static methods:
 
-| Метод | Назначение |
+| Method | Purpose |
 |---|---|
-| `parseBlock(block)` | дополнение блока хэшем, номером и датой |
-| `getBlockDate(block)` | дата блока из заголовка первой транзакции |
-| `createConnection(settings, wallet?)` | сборка подключения без создания клиента |
-| `createWallet(settings)` | кошелёк в памяти из настроек |
+| `parseBlock(block)` | enrich a block with its hash, number and date |
+| `getBlockDate(block)` | block date from the first transaction's header |
+| `createConnection(settings, wallet?)` | assemble a connection without creating a client |
+| `createWallet(settings)` | in-memory wallet from the settings |
 
 ### IFabricConnectionSettings
 
@@ -239,22 +244,22 @@ export interface IFabricConnectionSettings {
 }
 ```
 
-| Параметр | Назначение |
+| Parameter | Purpose |
 |---|---|
-| `uid` | идентификатор настроек, используется фабриками |
-| `fabricNetworkName` | имя канала |
-| `fabricChaincodeName` | имя chaincode |
-| `fabricConnectionSettings` | профиль подключения: путь, объект или `Client` |
-| `fabricIsDiscoveryEnabled` | использовать service discovery |
-| `fabricIsDiscoveryAsLocalhost` | считать адреса локальными — для запуска сети в Docker на той же машине |
-| `fabricIdentity*` | идентичность: имя, MSP, приватный ключ и сертификат |
-| `fabricTlsIdentity*` | отдельная идентичность для взаимного TLS |
+| `uid` | settings identifier, used by factories |
+| `fabricNetworkName` | channel name |
+| `fabricChaincodeName` | chaincode name |
+| `fabricConnectionSettings` | connection profile: path, object or `Client` |
+| `fabricIsDiscoveryEnabled` | use service discovery |
+| `fabricIsDiscoveryAsLocalhost` | treat addresses as local — for running the network in Docker on the same machine |
+| `fabricIdentity*` | identity: name, MSP, private key and certificate |
+| `fabricTlsIdentity*` | a separate identity for mutual TLS |
 
-Есть и класс `FabricConnectionSettings` с декораторами `class-validator` — им удобно валидировать настройки, пришедшие из конфигурации.
+There is also a `FabricConnectionSettings` class with `class-validator` decorators — convenient for validating settings that come from configuration.
 
 ### FabricContractQSCC
 
-Обёртка над системным контрактом `qscc`, доступная как `api.qsccContract`.
+A wrapper over the `qscc` system contract, available as `api.qsccContract`.
 
 ```ts
 getInfo(channel?): Promise<IFabricChannelInfo>
@@ -264,15 +269,15 @@ getBlockByTransactionId(id: string, channel?): Promise<IFabricBlock>
 getTransaction(id: string, channel?): Promise<IFabricTransaction>
 ```
 
-| Метод | Что возвращает |
+| Method | What it returns |
 |---|---|
-| `getInfo` | высота цепи и хэши текущего и предыдущего блоков |
-| `getBlockNumber` | высота цепи — то есть количество блоков (см. [важные особенности](#важные-особенности)) |
-| `getBlock` | блок по номеру либо по хэшу в шестнадцатеричном виде |
-| `getBlockByTransactionId` | блок, в который попала транзакция |
-| `getTransaction` | транзакция по идентификатору |
+| `getInfo` | chain height and the hashes of the current and previous blocks |
+| `getBlockNumber` | chain height — that is, the number of blocks (see [Important Notes](#important-notes)) |
+| `getBlock` | a block by number or by hash in hexadecimal form |
+| `getBlockByTransactionId` | the block that the transaction landed in |
+| `getTransaction` | a transaction by its id |
 
-Канал можно не указывать — тогда используется канал из настроек клиента.
+The channel is optional — if omitted, the channel from the client's settings is used.
 
 ```ts
 export interface IFabricChannelInfo {
@@ -296,11 +301,11 @@ class FabricContract extends DestroyableContainer {
 }
 ```
 
-Базовая обёртка над контрактом по имени. Используется для обращения к дополнительным chaincode в том же канале и служит основой для `FabricContractQSCC`.
+A base wrapper over a contract by name. Used to access additional chaincode in the same channel and serves as the foundation for `FabricContractQSCC`.
 
 ### FabricTransactionValidationCode
 
-Полный перечень кодов валидации транзакции.
+The complete set of transaction validation codes.
 
 ```ts
 export enum FabricTransactionValidationCode {
@@ -314,7 +319,7 @@ export enum FabricTransactionValidationCode {
 }
 ```
 
-Транзакция попадает в блок независимо от результата проверки, поэтому наличие транзакции в блоке ещё не означает, что она применена — смотреть нужно на код. Самые частые в рабочей сети: `MVCC_READ_CONFLICT` при параллельных изменениях одного ключа и `ENDORSEMENT_POLICY_FAILURE` при нехватке подписей.
+A transaction lands in a block regardless of the validation result, so the presence of a transaction in a block does not yet mean it was applied — you have to look at the code. The most common in a production network are `MVCC_READ_CONFLICT` on concurrent changes to the same key and `ENDORSEMENT_POLICY_FAILURE` when signatures are insufficient.
 
 ### FabricUtil
 
@@ -324,7 +329,7 @@ FabricUtil.fromUintArray(item: Uint8Array, encoding?: BufferEncoding): string
 FabricUtil.fromUintArrayToBuffer(item: Uint8Array): Buffer
 ```
 
-Преобразование типов протобуфа в привычные: `Long` в число, байтовый массив в строку (по умолчанию шестнадцатеричную) или буфер.
+Converting protobuf types into familiar ones: `Long` to a number, a byte array to a string (hexadecimal by default) or a buffer.
 
 ### FabricConnectionFileParser
 
@@ -336,9 +341,9 @@ FabricConnectionFileParser.isPemFormat(item: string): boolean
 parser.certsPathsToPem(file: any, isNeedRemovePath?: boolean): any
 ```
 
-Загрузка профиля подключения и работа с сертификатами: определение PEM-формата, приведение PEM к однострочному виду и подстановка содержимого сертификатов вместо путей.
+Loading the connection profile and working with certificates: detecting the PEM format, reducing PEM to a single line, and substituting certificate contents for paths.
 
-### Фабрики
+### Factories
 
 ```ts
 class FabricApiClientFactory {
@@ -351,17 +356,17 @@ class FabricConnectionSettingsFactory<T extends IFabricConnectionSettings> {
 }
 ```
 
-`FabricConnectionSettingsFactory` хранит настройки нескольких подключений и приводит их к рабочему виду: поля с ключами и сертификатами могут быть как PEM-строкой, так и путём к файлу — фабрика разберётся сама. Настройки без `uid` отбрасываются с предупреждением.
+`FabricConnectionSettingsFactory` stores settings for multiple connections and brings them into working shape: the fields with keys and certificates may be either a PEM string or a path to a file — the factory figures it out itself. Settings without a `uid` are discarded with a warning.
 
-`FabricApiClientFactory` создаёт клиентов по этим настройкам и переиспользует их: повторный `get` с тем же `uid` вернёт уже подключённый клиент.
+`FabricApiClientFactory` creates clients from those settings and reuses them: a repeated `get` with the same `uid` returns an already connected client.
 
-## Примеры использования
+## Usage Examples
 
-### Чтение блоков по номерам
+### Reading Blocks by Number
 
 ```ts
 let info = await api.qsccContract.getInfo();
-console.log(`Высота цепи: ${info.height}`);
+console.log(`Chain height: ${info.height}`);
 
 for (let number = 0; number < info.height; number++) {
     let block = await api.qsccContract.getBlock(number);
@@ -369,20 +374,20 @@ for (let number = 0; number < info.height; number++) {
 }
 ```
 
-### Поиск транзакции
+### Finding a Transaction
 
 ```ts
 let transaction = await api.qsccContract.getTransaction(hash);
 
 if (transaction.validationCode !== FabricTransactionValidationCode.VALID) {
-    console.log(`Транзакция отклонена: ${FabricTransactionValidationCode[transaction.validationCode]}`);
+    console.log(`Transaction rejected: ${FabricTransactionValidationCode[transaction.validationCode]}`);
 }
 
 let block = await api.qsccContract.getBlockByTransactionId(hash);
-console.log(`Блок: ${block.number}`);
+console.log(`Block: ${block.number}`);
 ```
 
-### Подписка на новые блоки
+### Subscribing to New Blocks
 
 ```ts
 await api.network.addBlockListener(async event => {
@@ -391,7 +396,7 @@ await api.network.addBlockListener(async event => {
 });
 ```
 
-### Несколько подключений
+### Multiple Connections
 
 ```ts
 let settings = new FabricConnectionSettingsFactory(logger);
@@ -406,7 +411,7 @@ let first = await factory.get('org1');
 let second = await factory.get('org2');
 ```
 
-### Профиль подключения с сертификатами
+### Connection Profile with Certificates
 
 ```ts
 let parser = new FabricConnectionFileParser(logger);
@@ -415,68 +420,68 @@ let profile = parser.certsPathsToPem(JSON.parse(FabricConnectionFileParser.load(
 let api = new FabricApiClient(logger, { ...settings, fabricConnectionSettings: profile });
 ```
 
-## Важные особенности
+## Important Notes
 
-**`getBlockNumber` возвращает высоту, а не номер последнего блока.** Метод отдаёт `info.height` — количество блоков в цепи. Номер последнего блока на единицу меньше, поскольку нумерация начинается с нуля. При обходе блоков это удобно (`for (let i = 0; i < height; i++)`), но если нужен именно последний блок, вычитайте единицу.
+**`getBlockNumber` returns the height, not the number of the last block.** The method returns `info.height` — the number of blocks in the chain. The number of the last block is one less, since numbering starts from zero. This is handy when iterating over blocks (`for (let i = 0; i < height; i++)`), but if you need the last block specifically, subtract one.
 
-**Повторов подключения нет.** Метод `reconnect` несмотря на название выполняет одну попытку: при ошибке он сразу отключает клиент. Логика повторов реализована уровнем выше, в `@hlf-core/transport`.
+**There are no connection retries.** The `reconnect` method, despite its name, makes a single attempt: on an error it disconnects the client immediately. The retry logic is implemented one level up, in `@hlf-core/transport`.
 
-**`parseBlock` изменяет переданный объект.** Метод не создаёт копию, а дописывает поля в исходный блок и возвращает его же. Это дёшево, но означает, что объект блока после вызова уже не тот, что пришёл из Fabric.
+**`parseBlock` mutates the object passed to it.** The method does not make a copy; it writes the fields into the original block and returns it. This is cheap, but it means the block object after the call is no longer the one that came from Fabric.
 
-**Дата блока может быть `null`.** Она берётся из заголовка первой транзакции; у блока без данных даты не будет.
+**A block's date can be `null`.** It is taken from the header of the first transaction; a block without data will have no date.
 
-**Кошелёк живёт в памяти.** `createWallet` использует `Wallets.newInMemoryWallet()`, ключи никуда не сохраняются. Хранение и защита секретов — забота приложения.
+**The wallet lives in memory.** `createWallet` uses `Wallets.newInMemoryWallet()`, and the keys are never persisted. Storing and protecting secrets is the application's concern.
 
-## Структура проекта
+## Project Structure
 
 ```
 src/
-├── FabricApiClient.ts                    клиент: подключение, доступ к сети и контрактам
-├── FabricApiError.ts                     ошибки и коды
-├── FabricUtil.ts                         преобразование типов протобуфа
-├── FabricTransactionValidationCode.ts    коды валидации транзакции
-├── Block.ts                              структура блока
-├── IFabricBlock.ts                       блок с хэшем, номером и датой
-├── IFabricTransaction.ts                 транзакция с кодом валидации
-├── IFabricChannelInfo.ts                 высота цепи и хэши блоков
-├── IFabricConnection.ts                  шлюз, кошелёк, сеть, канал, контракт
-├── IFabricConnectionSettings.ts          настройки подключения и их валидация
-├── public-api.ts                         публичный API пакета
+├── FabricApiClient.ts                    client: connection, access to network and contracts
+├── FabricApiError.ts                     errors and codes
+├── FabricUtil.ts                         protobuf type conversion
+├── FabricTransactionValidationCode.ts    transaction validation codes
+├── Block.ts                              block structure
+├── IFabricBlock.ts                       block with hash, number and date
+├── IFabricTransaction.ts                 transaction with validation code
+├── IFabricChannelInfo.ts                 chain height and block hashes
+├── IFabricConnection.ts                  gateway, wallet, network, channel, contract
+├── IFabricConnectionSettings.ts          connection settings and their validation
+├── public-api.ts                         package public API
 ├── contract/
-│   ├── FabricContract.ts                 обёртка контракта по имени
-│   └── FabricContractQSCC.ts             системный контракт: блоки и транзакции
+│   ├── FabricContract.ts                 contract wrapper by name
+│   └── FabricContractQSCC.ts             system contract: blocks and transactions
 ├── factory/
-│   ├── FabricApiClientFactory.ts         переиспользование клиентов
-│   └── FabricConnectionSettingsFactory.ts  настройки нескольких подключений
+│   ├── FabricApiClientFactory.ts         client reuse
+│   └── FabricConnectionSettingsFactory.ts  settings for multiple connections
 └── parser/
-    └── FabricConnectionFileParser.ts     профиль подключения и сертификаты
+    └── FabricConnectionFileParser.ts     connection profile and certificates
 ```
 
-## Связанные пакеты
+## Related Packages
 
-| Пакет | Роль |
+| Package | Role |
 |---|---|
-| [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport) | транспорт поверх этого клиента: команды, блоки, события |
-| [@hlf-core/transport-common](https://www.npmjs.com/package/@hlf-core/transport-common) | общий протокол транспорта |
-| [@hlf-core/common](https://www.npmjs.com/package/@hlf-core/common) | базовые классы экосистемы |
+| [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport) | transport on top of this client: commands, blocks, events |
+| [@hlf-core/transport-common](https://www.npmjs.com/package/@hlf-core/transport-common) | shared transport protocol |
+| [@hlf-core/common](https://www.npmjs.com/package/@hlf-core/common) | base classes of the ecosystem |
 
-## Лицензия
+## License
 
 ISC
 
-## Автор
+## Author
 
-**Ренат Губаев**
+**Renat Gubaev**
 - Email: renat.gubaev@gmail.com
 - GitHub: [@ManhattanDoctor](https://github.com/ManhattanDoctor)
 
-## Ссылки
+## Links
 
 - [GitHub Repository](https://github.com/ManhattanDoctor/hlf-core-api)
 - [NPM Package](https://www.npmjs.com/package/@hlf-core/api)
 - [Issue Tracker](https://github.com/ManhattanDoctor/hlf-core-api/issues)
 - [Hyperledger Fabric Documentation](https://hyperledger-fabric.readthedocs.io/)
 
-## Поддержка
+## Support
 
-Если вы нашли баг или у вас есть предложение по улучшению, пожалуйста, создайте issue в [GitHub Issues](https://github.com/ManhattanDoctor/hlf-core-api/issues).
+If you found a bug or have a suggestion for improvement, please open an issue in [GitHub Issues](https://github.com/ManhattanDoctor/hlf-core-api/issues).
